@@ -147,10 +147,8 @@ public class Main {
                 FileWriter myWriter = new FileWriter(bookStore.getName(), true);
                 System.out.println("This file contains: ");
 
-                myWriter.write(", ");
-
                 for (int i = 0; i < bookInfo.size(); i++) {
-                    myWriter.write(bookInfo.get(i));
+                    myWriter.write(", " + bookInfo.get(i));
                 }
 
                 myWriter.close();
