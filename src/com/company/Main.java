@@ -18,17 +18,17 @@ public class Main {
 
     private static int numberOfBooks = 0;
 
-    private static String isbn;
-
-    private static String bookname;
+    private static String isbn, bookname, author, genre;
 
 
     private static File bookStore = new File("BookInfo.txt");
 
     public static void main(String[] args) {
         bookTitle();
-
         ISBN();
+        author();
+        genre();
+
 
         createFile();
 
@@ -57,60 +57,100 @@ public class Main {
     }
 
     private static void ISBN() {
-        try {
-            Scanner input = new Scanner(System.in);
-            for (int i = 0; i < numberOfBooks; i++) {
-                System.out.println("Please enter the ISBN");
-                isbn = Integer.toString(input.nextInt());
-                bookInfo.add(bookList.get(i) + "," + (isbn));
+        while (true) {
+            try {
+                Scanner input = new Scanner(System.in);
+                for (int i = 0; i < numberOfBooks; i++) {
+                    System.out.println("Please enter the ISBN");
+                    isbn = Integer.toString(input.nextInt());
+                    bookList.add(isbn);
+                }
+
+                break;
+
+            } catch (Exception e) {
+                System.out.println("Enter only numbers");
+            }
+        }
+    }
+
+    private static void author() {
+        while (true) {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                for (int i = 0; i < numberOfBooks; i++) {
+                    System.out.println("Please enter the author");
+                    author = (bufferedReader.readLine());
+                    bookList.add(author);
+                }
+
+                break;
+
+            } catch (Exception e) {
+                System.out.println("Enter a Valid response");
+            }
+        }
+    }
+
+        private static void genre () {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+                for (int i = 0; i < numberOfBooks; ++i) {
+                    System.out.println("Please enter the genre");
+                    genre = bufferedReader.readLine();
+                    //bookList.add(genre);
+                    bookInfo.add(bookList.get(i) + "," + (isbn) + "," + (author) + "," + (genre));
+                }
+
+                System.out.println(bookInfo);
+
+            } catch (Exception e) {
+                System.out.println("Enter a Valid response");
             }
 
-            System.out.println(bookInfo);
-
-        } catch (Exception e) {
-            System.out.println("Enter a Valid response");
         }
-    }
 
-    private static void createFile() {
-        try {
-            if (bookStore.createNewFile()) {
-                System.out.println("File Created: " + bookStore.getName());
-            } else {
-                System.out.println("File already exists.");
+
+        private static void createFile () {
+            try {
+                if (bookStore.createNewFile()) {
+                    System.out.println("File Created: " + bookStore.getName());
+                } else {
+                    System.out.println("File already exists.");
+                }
+            } catch (IOException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
         }
-    }
 
-    private static void writeToFile() {
-        try{
-            FileWriter myWriter = new FileWriter(bookStore.getName(), true);
-            System.out.println("This file contains: ");
-            myWriter.write(String.valueOf(bookInfo));
-            myWriter.close();
-            System.out.println("Successfully saved your information");
-        }catch (IOException e){
-            System.out.println("An error has occurred");
-            e.printStackTrace();
-        }
-    }
-
-    private static void readFile() {
-        try{
-            Scanner input = new Scanner(System.in);
-            //input.useDelimiter("\n")
-            while (input.hasNextLine()){
-                String data = input.nextLine();
-                System.out.println(data);
+        private static void writeToFile () {
+            try {
+                FileWriter myWriter = new FileWriter(bookStore.getName(), true);
+                System.out.println("This file contains: ");
+                myWriter.write(String.valueOf(bookInfo));
+                myWriter.close();
+                System.out.println("Successfully saved your information");
+            } catch (IOException e) {
+                System.out.println("An error has occurred");
+                e.printStackTrace();
             }
-            input.close();
-        }catch (Exception e){
-            System.out.println("An error has occurred, could not locate file");
-            e.printStackTrace();
+        }
+
+        private static void readFile () {
+            try {
+                Scanner input = new Scanner(System.in);
+                //input.useDelimiter("\n")
+                while (input.hasNextLine()) {
+                    String data = input.nextLine();
+                    System.out.println(data);
+                }
+                input.close();
+            } catch (Exception e) {
+                System.out.println("An error has occurred, could not locate file");
+                e.printStackTrace();
+            }
         }
     }
-}
 
