@@ -2,9 +2,6 @@ package com.company;
 //you have a global variable that isn't used an import that isn't used however the main method is clea, and you have good try catches
 //Good as you managed to keep the main method only a list of method calls, Global variable that isn't needed.
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
-import jdk.internal.util.xml.impl.Input;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -12,59 +9,74 @@ import java.util.List;
 
 public class Main {
 
-    private static List<String> bookList = new ArrayList<>();
+    // attributes of each book [title, isbn, author, genre]
+    private static final List<String> bookList = new ArrayList<>();
 
-    private static List<String> bookInfo = new ArrayList<>();
+    // multiple book strings ["title, isbn, author, genre", "title, isbn, author, genre"]
+    private static final List<String> bookInfo = new ArrayList<>();
 
-    private static int numberOfBooks = 0;
+    private static int numberOfBooks;
 
-    private static String isbn, bookname, author, genre;
+    // each is assigned a string by bookTitle(), ISBN(), author(), genre(). Then all are added to bookList which is added to bookInfo.
 
-
-    private static File bookStore = new File("BookInfo.txt");
+    private static final File bookStore = new File("BookInfo.txt");
 
     public static void main(String[] args) {
-        bookTitle();
-        ISBN();
-        author();
-        genre();
-
-
         createFile();
+        getNoBooks();
+
+        for (int i = 0; i < numberOfBooks; i++) {
+            bookTitle();
+            ISBN();
+            author();
+            genre();
+        }
 
         writeToFile();
-
         readFile();
-
+        DeleteFile();
 
     }
 
-    private static void bookTitle() {
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("How many books do you want to store");
-            numberOfBooks = Integer.parseInt(bufferedReader.readLine());
+    private static void getNoBooks() {
+        while (true) {
+            try {
+                // ask user for no. books
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println("How many books do you want to store");
+                numberOfBooks = Integer.parseInt(bufferedReader.readLine());
 
-            for (int i = 0; i < numberOfBooks; i++) {
-                System.out.println("please enter a book");
-                bookname = (bufferedReader.readLine());
-
-                bookList.add(bookname);
+                break;
+            } catch (IOException e) {
+                System.out.println("Exclusively enter numbers");
             }
-        } catch (Exception e) {
-            System.out.println("Enter a valid response");
         }
+    }
+
+    private static void bookTitle() {
+        while (true) {
+            try {
+                // ask user for no. books
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println("please enter a book");
+                bookList.add(bufferedReader.readLine());
+
+                break;
+            } catch (IOException e) {
+                System.out.println("Please type a valid input: ");
+            }
+        }
+
     }
 
     private static void ISBN() {
         while (true) {
             try {
                 Scanner input = new Scanner(System.in);
-                for (int i = 0; i < numberOfBooks; i++) {
-                    System.out.println("Please enter the ISBN");
-                    isbn = Integer.toString(input.nextInt());
-                    bookList.add(isbn);
-                }
+
+                System.out.println("Please enter the ISBN");
+
+                bookList.add(Integer.toString(input.nextInt()));
 
                 break;
 
@@ -78,11 +90,9 @@ public class Main {
         while (true) {
             try {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-                for (int i = 0; i < numberOfBooks; i++) {
-                    System.out.println("Please enter the author");
-                    author = (bufferedReader.readLine());
-                    bookList.add(author);
-                }
+
+                System.out.println("Please enter the author");
+                bookList.add(bufferedReader.readLine());
 
                 break;
 
@@ -93,16 +103,23 @@ public class Main {
     }
 
         private static void genre () {
+            // automatically adds to bookInfo
             try {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-                for (int i = 0; i < numberOfBooks; ++i) {
-                    System.out.println("Please enter the genre");
-                    genre = bufferedReader.readLine();
-                    //bookList.add(genre);
-                    bookInfo.add(bookList.get(i) + "," + (isbn) + "," + (author) + "," + (genre));
-                }
+                System.out.println("Please enter the genre");
+                bookList.add(bufferedReader.readLine());
 
+//                String result = "";
+//                for (int i = 0; i < bookList.size(); ++i) {
+//                    if (i != bookList.size()-1) {
+//                        result += bookList.get(i) + ",";
+//                    } else {
+//                        result += bookList.get(i);
+//                    }
+//                }
+                bookInfo.add(String.valueOf(bookList));
+                bookList.clear();
                 System.out.println(bookInfo);
 
             } catch (Exception e) {
@@ -125,11 +142,17 @@ public class Main {
             }
         }
 
-        private static void writeToFile () {
+        private static void writeToFile() {
             try {
                 FileWriter myWriter = new FileWriter(bookStore.getName(), true);
                 System.out.println("This file contains: ");
-                myWriter.write(String.valueOf(bookInfo));
+
+                myWriter.write(", ");
+
+                for (int i = 0; i < bookInfo.size(); i++) {
+                    myWriter.write(bookInfo.get(i));
+                }
+
                 myWriter.close();
                 System.out.println("Successfully saved your information");
             } catch (IOException e) {
@@ -140,7 +163,7 @@ public class Main {
 
         private static void readFile () {
             try {
-                Scanner input = new Scanner(System.in);
+                Scanner input = new Scanner(bookStore);
                 //input.useDelimiter("\n")
                 while (input.hasNextLine()) {
                     String data = input.nextLine();
@@ -151,6 +174,21 @@ public class Main {
                 System.out.println("An error has occurred, could not locate file");
                 e.printStackTrace();
             }
+        }
+
+        public static void DeleteFile() {
+            Scanner input = new Scanner(System.in);
+            System.out.println("Do you want to delete the file? y/n");
+            if (input.next().equalsIgnoreCase("y")) {
+                if (bookStore.delete()) {
+                    System.out.println("Deleted the file: " + bookStore.getName());
+                } else {
+                    System.out.println("Failed to delete the file.");
+                }
+            } else {
+                System.out.println("File not deleted");
+            }
+
         }
     }
 
