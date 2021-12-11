@@ -1,8 +1,10 @@
 package com.company;
-//you have a global variable that isn't used an import that isn't used however the main method is clea, and you have good try catches
-//Good as you managed to keep the main method only a list of method calls, Global variable that isn't needed.
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,8 +19,11 @@ public class Main {
     // multiple book strings ["title, isbn, author, genre", "title, isbn, author, genre"]
     private static final List<String> bookInfo = new ArrayList<>();
 
-    private static final List<String> useremails = new ArrayList<>();
-    private static final List<String> userpassword = new ArrayList<>();
+    //stores multiple registered emails
+    private static final List<String> userEmail = new ArrayList<>();
+
+    //stores multiple registered passwords
+    private static final List<String> userPassword = new ArrayList<>();
 
     private static int numberOfBooks;
 
@@ -26,8 +31,7 @@ public class Main {
 
     private static String email;
 
-    public static final int passwordLength = 8;
-
+    //searches for patterns to see if an email is valid or not
     private static final String regex = "^(.+)@(.+)$";
 
 
@@ -35,7 +39,6 @@ public class Main {
 
     private static final File bookStore = new File("BookInfo.txt");
 
-    private static final File login = new File("login.txt");
 
     public static void main(String[] args) {
 
@@ -62,6 +65,7 @@ public class Main {
     private static void menu() {
         while (true) {
             try {
+                //main menu to ask for login and register
                 Scanner input = new Scanner(System.in);
                 System.out.println("would you like to login or register?: ");
                 String userInput = input.nextLine();
@@ -73,7 +77,11 @@ public class Main {
                 if (userInput.equalsIgnoreCase("register")) {
                     register();
                     break;
+
+                } else {
+                    System.out.println("Please enter a valid input");
                 }
+
             } catch (Exception e) {
                 System.out.println("Please enter a valid input");
             }
@@ -88,11 +96,15 @@ public class Main {
                 System.out.println("please enter a email address you would like to register with: ");
 
                 email = input.next();
-                useremails.add(email);
+                userEmail.add(email);//need to fix where this is (validate the email then add it to the array)
+
+                //checks if an email is valid with regex, if it is it will proceed to ask for a password
                 if (validEmail(email)) {
                     System.out.println("you have a valid email");
                     break;
-                } else System.out.println("enter a valid email");
+                } else {
+                    System.out.println("invalid email try again");
+                }
             } catch (Exception e) {
                 System.out.println("error" + e);
             }
@@ -105,26 +117,27 @@ public class Main {
                 System.out.println("please enter a password: ");
 
                 password = input.next();
+                //checks if a password is valid, the password has to have at least 8 letters and 2 numbers in it for a password to be valid
                 if (validPassword(password)) {
                     System.out.println("password is valid");
-                    userpassword.add(password);
+                    userPassword.add(password);
                     break;
                 } else System.out.println("password too weak try again");
             } catch (Exception e) {
                 System.out.println("error" + e);
             }
         }
-
+        menu();
     }
 
     private static boolean validEmail(String email) {
-
+        //uses regex to see if an email is valid using patterns
         Pattern pattern = Pattern.compile(regex);
-        for (String value : useremails) {
+        for (String value : userEmail) {
             Matcher matcher = pattern.matcher(value);
-
+            //if the email matches the pattern it will return value as true so the email will be valid
             if (matcher.matches()) return true;
-
+            // if the password doesn't match the regex it will return false and the email will not be valid
             else return false;
 
         }
@@ -132,23 +145,24 @@ public class Main {
     }
 
     private static boolean validPassword(String password) {
-        if (Main.password.length() < passwordLength) return false;
-
+        final int passwordLength = 8;
+        if (Main.password.length() < passwordLength) return false; // if the password length is greater than the inputted password length it will return as false
+                                                                   // meaning it's not valid
         int charCount = 0;
         int numCount = 0;
 
-        for (int i = 0; i < Main.password.length(); i++) {
+        for (int i = 0; i < Main.password.length(); i++) { //this will loop through every character in the password and add to the num and char count
 
             char ch = Main.password.charAt(i);
 
-            if (Character.isLetter(ch)) charCount++;
-            else if (Character.isDigit(ch)) numCount++;
-            else if (ch == ' ') charCount++;
+            if (is_Letter(ch)) charCount++; //for every char it will add 1 to the char count
+            else if (is_Numeric(ch)) numCount++; // for every number it will add 1 to the char count
+            else if (ch == ' ') charCount++; //spaces will add to the char count as well
 
             else return false;
         }
 
-        return (charCount >= 2 && numCount > 2);
+        return (charCount >= 2 && numCount > 2); //num count has to be greater than 2 and char count has to be equal or less than to 2 to come back as valid
     }
 
     public static boolean is_Letter(char ch) {
@@ -156,15 +170,41 @@ public class Main {
         return (ch >= 'A' && ch <= 'Z');
     }
 
-
     public static boolean is_Numeric(char ch) {
 
         return (ch >= '0' && ch <= '9');
     }
 
-
     private static void login() {
-        System.out.println("login");
+        while (true) {
+            try {
+                Scanner input = new Scanner(System.in);
+                System.out.println("Please enter a email");
+
+                String emailInput = input.next();
+
+                for (int i = 0; i < userEmail.size(); i++) {
+                    String currentMail = userEmail.get(i); //if the user inputs an email that is registered it will ask for the password
+                    if (emailInput.equals(currentMail)) {
+
+                        System.out.println("Please enter a password");
+                        String passwordInput = input.next();
+
+                        if (passwordInput.equals(userPassword.get(i))) { //it will log in if the user matches the password correctly with the one registered
+                            System.out.println("you have logged in");
+                            break;
+                        } else {
+                            System.out.println("invalid password try again");
+                        }
+                    } else {
+                        System.out.println("invalid email try again");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("error" + e);
+            }
+            return;
+        }
     }
 
     private static void getNoBooks() {
@@ -238,7 +278,7 @@ public class Main {
 
             System.out.println("Please enter the genre");
             bookList.add(bufferedReader.readLine());
-            
+
             bookInfo.add(String.valueOf(bookList));
             bookList.clear();
             System.out.println(bookInfo);
@@ -248,7 +288,6 @@ public class Main {
         }
 
     }
-
 
     private static void createFile() {
         try {
@@ -265,7 +304,7 @@ public class Main {
 
     private static void writeToFile() {
         try {
-            FileWriter myWriter = new FileWriter(bookStore.getName(), true);
+            FileWriter myWriter = new FileWriter(bookStore.getName(), true); //writes the attributes to a file in order
             System.out.println("This file contains: ");
 
             for (int i = 0; i < bookInfo.size(); i++) {
@@ -282,8 +321,7 @@ public class Main {
 
     private static void readFile() {
         try {
-            Scanner input = new Scanner(bookStore);
-            //input.useDelimiter("\n")
+            Scanner input = new Scanner(bookStore); //reads what's in the file and prints it out
             while (input.hasNextLine()) {
                 String data = input.nextLine();
                 System.out.println(data);
@@ -296,8 +334,8 @@ public class Main {
     }
 
     public static void DeleteFile() {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Do you want to delete the file? y/n");
+        Scanner input = new Scanner(System.in); //asks if you want to delete the whole library
+        System.out.println("Do you want to delete the file? y/n"); // (need to make an edit feature where you can edit the names and delete certain attributes)
         if (input.next().equalsIgnoreCase("y")) {
             if (bookStore.delete()) {
                 System.out.println("Deleted the file: " + bookStore.getName());
