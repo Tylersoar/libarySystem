@@ -137,7 +137,7 @@ public class Main {
             Matcher matcher = pattern.matcher(value);
             //if the email matches the pattern it will return value as true so the email will be valid
             if (matcher.matches()) return true;
-            // if the password doesn't match the regex it will return false and the email will not be valid
+                // if the password doesn't match the regex it will return false and the email will not be valid
             else return false;
 
         }
@@ -146,8 +146,9 @@ public class Main {
 
     private static boolean validPassword(String password) {
         final int passwordLength = 8;
-        if (Main.password.length() < passwordLength) return false; // if the password length is greater than the inputted password length it will return as false
-                                                                   // meaning it's not valid
+        if (Main.password.length() < passwordLength)
+            return false; // if the password length is greater than the inputted password length it will return as false
+        // meaning it's not valid
         int charCount = 0;
         int numCount = 0;
 
@@ -178,6 +179,12 @@ public class Main {
     private static void login() {
         while (true) {
             try {
+                if (userEmail.isEmpty()) {
+                    System.out.println("no email has been registered");
+                    menu();
+                    break;
+                }
+
                 Scanner input = new Scanner(System.in);
                 System.out.println("Please enter a email");
 
@@ -204,6 +211,47 @@ public class Main {
                 System.out.println("error" + e);
             }
             return;
+        }
+    }
+
+    private static void loginMenu() {
+        while (true) {
+            try {
+                //main menu to ask for login and register
+                Scanner input = new Scanner(System.in);
+                System.out.println("would you like to store a book, search, log off?: ");
+                System.out.println("Please type either: store a book, search, log off ");
+                String userInput = input.nextLine();
+
+                if (userInput.equalsIgnoreCase("store a book")) {
+                    getNoBooks();
+
+                    for (int i = 0; i < numberOfBooks; i++) {
+                        bookTitle();
+                        ISBN();
+                        author();
+                        genre();
+                    }
+
+                    writeToFile();
+                    readFile();
+                    DeleteFile();
+                    break;
+                }
+                if (userInput.equalsIgnoreCase("search")) {
+
+                    break;
+                }
+                if (userInput.equalsIgnoreCase("log off")) {
+                    menu();
+                    break;
+                } else {
+                    System.out.println("Please enter a valid input");
+                }
+
+            } catch (Exception e) {
+                System.out.println("Please enter a valid input");
+            }
         }
     }
 
@@ -334,17 +382,25 @@ public class Main {
     }
 
     public static void DeleteFile() {
-        Scanner input = new Scanner(System.in); //asks if you want to delete the whole library
-        System.out.println("Do you want to delete the file? y/n"); // (need to make an edit feature where you can edit the names and delete certain attributes)
-        if (input.next().equalsIgnoreCase("y")) {
-            if (bookStore.delete()) {
-                System.out.println("Deleted the file: " + bookStore.getName());
-            } else {
-                System.out.println("Failed to delete the file.");
-            }
-        } else {
-            System.out.println("File not deleted");
-        }
+        while (true) {
+            try {
+                Scanner input = new Scanner(System.in); //asks if you want to delete the whole library
+                System.out.println("Do you want to delete the file? y/n"); // (need to make an edit feature where you can edit the names and delete certain attributes)
+                if (input.next().equalsIgnoreCase("y")) {
+                    if (bookStore.delete()) {
+                        System.out.println("Deleted the file: " + bookStore.getName());
+                        loginMenu();
+                        break;
+                    } else {
+                        System.out.println("Failed to delete the file.");
+                        loginMenu();
+                        break;
+                    }
+                }
 
+            }catch (Exception e){
+                System.out.println("please enter a valid input");
+            }
+        }
     }
 }
