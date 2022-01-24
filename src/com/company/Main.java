@@ -25,6 +25,11 @@ public class Main {
     //stores multiple registered passwords
     private static final List<String> userPassword = new ArrayList<>();
 
+    private static final List<String> userInfo = new ArrayList<>();
+
+
+
+
     private static int numberOfBooks;
 
     private static String password;
@@ -35,15 +40,21 @@ public class Main {
     private static final String regex = "^(.+)@(.+)$";
 
 
+
+
+
     // each is assigned a string by bookTitle(), ISBN(), author(), genre(). Then all are added to bookList which is added to bookInfo.
 
     private static final File bookStore = new File("BookInfo.txt");
+    private static final File userLoginStore = new File("UserInfo.txt");
 
 
     public static void main(String[] args) {
 
         menu();
         validPassword(password);
+        createUserLoginFile();
+        writeUserLoginFile();
 
 
         createFile();
@@ -70,9 +81,10 @@ public class Main {
                 System.out.println("would you like to login or register?: ");
                 String userInput = input.nextLine();
 
+
                 if (userInput.equalsIgnoreCase("login")) {
-                    login();
-                    break;
+                        login();
+                        break;
                 }
                 if (userInput.equalsIgnoreCase("register")) {
                     register();
@@ -97,6 +109,7 @@ public class Main {
 
                 email = input.next();
                 userEmail.add(email);//need to fix where this is (validate the email then add it to the array)
+                userInfo.add(String.valueOf(userEmail));
 
                 //checks if an email is valid with regex, if it is it will proceed to ask for a password
                 if (validEmail(email)) {
@@ -121,13 +134,13 @@ public class Main {
                 if (validPassword(password)) {
                     System.out.println("password is valid");
                     userPassword.add(password);
+                    userInfo.add(String.valueOf(userPassword));
                     break;
                 } else System.out.println("password too weak try again");
             } catch (Exception e) {
                 System.out.println("error" + e);
             }
         }
-        menu();
     }
 
     private static boolean validEmail(String email) {
@@ -176,6 +189,31 @@ public class Main {
         return (ch >= '0' && ch <= '9');
     }
 
+    private static void createUserLoginFile() {
+        try {
+            if(userLoginStore.createNewFile()){
+                System.out.println("File created: " + userLoginStore.getName());
+            }
+        } catch (Exception e) {
+            System.out.println("Error try again");
+        }
+    }
+
+    private static void writeUserLoginFile(){
+        try {
+            FileWriter writer = new FileWriter((userLoginStore.getName()),true);
+            for (int i = 0; i < userInfo.size(); i++) {
+                writer.write(userInfo.get(i)+ ", ");
+
+                }writer.close();
+            System.out.println("Successfully saved your information");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        menu();
+    }
+
     private static void login() {
         while (true) {
             try {
@@ -199,18 +237,64 @@ public class Main {
 
                         if (passwordInput.equals(userPassword.get(i))) { //it will log in if the user matches the password correctly with the one registered
                             System.out.println("you have logged in");
+                            loginMenu();
                             break;
                         } else {
                             System.out.println("invalid password try again");
+                            login();
+                            break;
                         }
                     } else {
                         System.out.println("invalid email try again");
+                        login();
+                        break;
                     }
                 }
             } catch (Exception e) {
                 System.out.println("error" + e);
             }
             return;
+        }
+    }
+
+    private static void loginMenu() {
+        while (true) {
+            try {
+                //main menu to ask for login and register
+                Scanner input = new Scanner(System.in);
+                System.out.println("would you like to store a book, search, log off?: ");
+                System.out.println("Please type either: store a book, search, log off ");
+                String userInput = input.nextLine();
+
+                if (userInput.equalsIgnoreCase("store a book")) {
+                    getNoBooks();
+
+                    for (int i = 0; i < numberOfBooks; i++) {
+                        bookTitle();
+                        ISBN();
+                        author();
+                        genre();
+                    }
+
+                    writeToFile();
+                    readFile();
+                    DeleteFile();
+                    break;
+                }
+                if (userInput.equalsIgnoreCase("search")) {
+
+                    break;
+                }
+                if (userInput.equalsIgnoreCase("log off")) {
+                    menu();
+                    break;
+                } else {
+                    System.out.println("Please enter a valid input");
+                }
+
+            } catch (Exception e) {
+                System.out.println("Please enter a valid input");
+            }
         }
     }
 
@@ -289,6 +373,12 @@ public class Main {
     private static void ISBN() {
         while (true) {
             try {
+                if (userInfo.isEmpty()) {
+                    System.out.println("no email has been registered");
+                    menu();
+                    break;
+                }
+
                 Scanner input = new Scanner(System.in);
 
                 System.out.println("Please enter the ISBN");
@@ -399,6 +489,10 @@ public class Main {
                 }
 
             }catch (Exception e){
+                System.out.println("please enter a valid input");
+            }
+        }
+            } catch (Exception e) {
                 System.out.println("please enter a valid input");
             }
         }
